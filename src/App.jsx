@@ -8,10 +8,36 @@ const SLIDES = Array.from({ length: 9 }, (_, index) => {
 const AUTO_INTERVAL_MS = 10000;
 const SWIPE_THRESHOLD_PX = 48;
 
+const TEXT_PATCHES = {
+  4: {
+    tone: 'red',
+    lines: [
+      '呼吸をしていないと思ったら、',
+      '直ちに胸の真ん中を',
+      '強く・速く・絶え間なく圧迫します。',
+    ],
+  },
+  6: {
+    tone: 'red',
+    lines: [
+      'AEDが「離れてください」と音声案内をしたら、',
+      '全員がその人の体から離れます。',
+    ],
+  },
+  7: {
+    tone: 'purple',
+    lines: [
+      '誰もその人の体に触れていないことを確認し、',
+      'ショックボタンを押します。',
+    ],
+  },
+};
+
 export default function App() {
   const [current, setCurrent] = useState(0);
   const [auto, setAuto] = useState(true);
   const touchStartX = useRef(null);
+  const patch = TEXT_PATCHES[current];
 
   const goNext = useCallback(() => {
     setCurrent((value) => (value + 1) % SLIDES.length);
@@ -83,13 +109,22 @@ export default function App() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <img
-        key={SLIDES[current]}
-        className="slide-image"
-        src={SLIDES[current]}
-        alt={`BLS AED slide ${current + 1} of ${SLIDES.length}`}
-        draggable="false"
-      />
+      <div className="slide-stage">
+        <img
+          key={SLIDES[current]}
+          className="slide-image"
+          src={SLIDES[current]}
+          alt={`BLS AED slide ${current + 1} of ${SLIDES.length}`}
+          draggable="false"
+        />
+        {patch && (
+          <div className={`text-patch patch-${current + 1} patch-${patch.tone}`}>
+            {patch.lines.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+          </div>
+        )}
+      </div>
     </main>
   );
 }
